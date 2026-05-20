@@ -195,7 +195,7 @@ export default function Home() {
 
           <textarea
             placeholder="Tell us about your project..."
-            rows="5"
+            rows={5}
             className="w-full p-4 rounded-xl bg-white text-black"
           ></textarea>
 
