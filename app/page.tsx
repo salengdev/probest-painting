@@ -1,19 +1,29 @@
 "use client";
 
 import { useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
+  const [captcha, setCaptcha] = useState<string | null>(null);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
+
+    // CAPTCHA check (frontend safety)
+    if (!captcha) {
+      alert("Please complete the CAPTCHA");
+      setLoading(false);
+      return;
+    }
 
     const formData = {
       name: e.target.name.value,
       email: e.target.email.value,
       phone: e.target.phone.value,
       message: e.target.message.value,
+      captcha,
     };
 
     try {
@@ -26,6 +36,7 @@ export default function Home() {
       if (res.ok) {
         alert("Message sent successfully! We will contact you soon.");
         e.target.reset();
+        setCaptcha(null);
       } else {
         alert("Something went wrong. Please try again.");
       }
@@ -39,39 +50,29 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
 
-      {/* PREMIUM HEADER */}
+      {/* HEADER */}
       <header className="fixed top-0 w-full z-50">
         <div className="bg-black/20 backdrop-blur-md border-b border-white/10">
           <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
 
-            {/* LOGO */}
-            <h1 className="font-bold text-xl text-white tracking-wide">
+            <h1 className="font-bold text-xl text-white">
               ProBest Painting
             </h1>
 
-            {/* NAV */}
             <nav className="space-x-6 text-sm font-medium flex items-center text-white/90">
-              <a href="#services" className="hover:text-white transition">
-                Services
-              </a>
-              <a href="#why" className="hover:text-white transition">
-                Why Us
-              </a>
-              <a href="#gallery" className="hover:text-white transition">
-                Gallery
-              </a>
-              <a href="#contact" className="hover:text-white transition">
-                Contact
-              </a>
+              <a href="#services" className="hover:text-white transition">Services</a>
+              <a href="#why" className="hover:text-white transition">Why Us</a>
+              <a href="#gallery" className="hover:text-white transition">Gallery</a>
+              <a href="#contact" className="hover:text-white transition">Contact</a>
 
-              {/* CTA BUTTON */}
               <a
                 href="tel:604-618-0023"
-                className="ml-4 bg-white text-black px-4 py-2 rounded-lg text-sm font-semibold hover:scale-105 transition"
+                className="ml-4 bg-white text-black px-4 py-2 rounded-lg text-sm font-semibold"
               >
                 Call Now
               </a>
             </nav>
+
           </div>
         </div>
       </header>
@@ -83,7 +84,6 @@ export default function Home() {
           backgroundImage: "url('/gallery/1.jpg')",
         }}
       >
-        {/* SOFT PREMIUM OVERLAY */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />
 
         <div className="relative max-w-3xl text-white pt-20">
@@ -92,18 +92,18 @@ export default function Home() {
           </h2>
 
           <p className="text-lg text-gray-200 mb-8">
-            Interior • Exterior • Residential • Commercial • Strata
+            Residential • Commercial • Strata • Interior • Exterior
           </p>
 
           <a
             href="#contact"
-            className="bg-white text-black px-8 py-3 rounded-xl font-semibold hover:scale-105 transition inline-block"
+            className="bg-white text-black px-8 py-3 rounded-xl font-semibold"
           >
             Get Free Quote
           </a>
 
           <p className="mt-4 text-sm text-gray-200">
-            Or call us:{" "}
+            Or call:{" "}
             <a href="tel:604-618-0023" className="underline">
               604-618-0023
             </a>
@@ -131,15 +131,15 @@ export default function Home() {
           {[
             {
               title: "Reliable & On Time",
-              desc: "We show up when we say we will and complete projects on schedule.",
+              desc: "We show up when we say we will and finish on schedule.",
             },
             {
               title: "Clean Workspaces",
-              desc: "We protect your home and leave everything clean after finishing.",
+              desc: "We protect your home and leave everything spotless.",
             },
             {
               title: "High Quality Finish",
-              desc: "We focus on detail and long-lasting professional results.",
+              desc: "We focus on detail and long-lasting results.",
             },
           ].map((item) => (
             <div key={item.title} className="p-6 border rounded-2xl">
@@ -191,7 +191,10 @@ export default function Home() {
               "/gallery/1.jpg",
               "/gallery/2.jpg",
               "/gallery/3.jpg",
-             ].map((img, i) => (
+              "/gallery/4.jpg",
+              "/gallery/5.jpg",
+              "/gallery/6.jpg",
+            ].map((img, i) => (
               <div
                 key={i}
                 className="overflow-hidden rounded-2xl shadow hover:shadow-xl transition group"
@@ -250,6 +253,14 @@ export default function Home() {
             className="w-full p-4 border rounded-xl"
             required
           />
+
+          {/* CAPTCHA (NO KEY HERE) */}
+          <div className="pt-2">
+            <ReCAPTCHA
+              sitekey=""
+              onChange={(value) => setCaptcha(value)}
+            />
+          </div>
 
           <button
             type="submit"

@@ -1,15 +1,40 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || "");
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const { name, email, phone, message } = body;
+    const { name, email, phone, message, captcha } = body;
 
-    // 1. EMAIL TO YOU (LEAD NOTIFICATION)
+    // -----------------------------------
+    // 1. CAPTCHA VERIFICATION (IMPORTANT)
+    // -----------------------------------
+    const verifyCaptcha = await fetch(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `secret=${process.env.RECAPTCHA_SECRET}&response=${captcha}`,
+      }
+    );
+
+    const captchaData = await verifyCaptcha.json();
+
+    if (!captchaData.success) {
+      return NextResponse.json(
+        { success: false, error: "Captcha failed" },
+        { status: 400 }
+      );
+    }
+
+    // -----------------------------------
+    // 2. SEND EMAIL TO YOU (LEAD)
+    // -----------------------------------
     await resend.emails.send({
       from: "ProBest Painting <onboarding@resend.dev>",
       to: "salkdee@gmail.com",
@@ -23,7 +48,9 @@ export async function POST(req: Request) {
       `,
     });
 
-    // 2. AUTO REPLY TO CUSTOMER
+    // -----------------------------------
+    // 3. AUTO REPLY TO CUSTOMER
+    // -----------------------------------
     await resend.emails.send({
       from: "ProBest Painting <onboarding@resend.dev>",
       to: email,
@@ -34,14 +61,14 @@ export async function POST(req: Request) {
 
           <p>We’ve received your request and will get back to you shortly.</p>
 
-          <p><b>Here’s what happens next:</b></p>
+          <p><b>What happens next:</b></p>
           <ul>
             <li>We review your project details</li>
             <li>We contact you within 24 hours</li>
-            <li>We may schedule a quick site visit or quote call</li>
+            <li>We may schedule a quote visit</li>
           </ul>
 
-          <p>If you need urgent help, reply to this email or call us directly.</p>
+          <p>If urgent, call us at 604-618-0023.</p>
 
           <br/>
           <p>– ProBest Painting Team</p>
@@ -51,7 +78,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error(error);
+    console.error("Contact API Error:", error);
 
     return NextResponse.json(
       { success: false, error: "Email failed" },
