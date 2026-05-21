@@ -65,17 +65,21 @@ export default function Home() {
         </div>
       </header>
 
-      {/* HERO */}
-      <section
-        className="h-[90vh] flex items-center justify-center text-center text-white relative"
-        style={{
-          backgroundImage: "url('/gallery/image1.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute inset-0 bg-black/60"></div>
+      {/* HERO (FIXED + BRIGHTER + CLEAN OVERLAY CONTROL) */}
+      <section className="relative h-[90vh] flex items-center justify-center text-center text-white">
 
+        {/* HERO IMAGE */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('/gallery/1.jpg')",
+          }}
+        />
+
+        {/* CONTROLLED OVERLAY (prevents too dark or too bright issues) */}
+        <div className="absolute inset-0 bg-black/50" />
+
+        {/* CONTENT */}
         <div className="relative max-w-3xl px-6">
           <h2 className="text-5xl md:text-6xl font-bold">
             Premium Painting Services
@@ -103,18 +107,22 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SERVICES */}
+      {/* SERVICES (RESTORED FULL LIST) */}
       <section id="services" className="py-24 max-w-6xl mx-auto px-6">
         <h3 className="text-3xl font-bold text-center mb-12">
           Services
         </h3>
 
-        <div className="grid md:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
           {[
             "Residential Painting",
-            "Commercial Projects",
+            "Commercial Painting",
+            "Interior Painting",
+            "Exterior Painting",
             "Strata Buildings",
             "Wallpaper Installation",
+            "Drywall Repair & Prep",
           ].map((item) => (
             <div
               key={item}
@@ -123,10 +131,11 @@ export default function Home() {
               {item}
             </div>
           ))}
+
         </div>
       </section>
 
-      {/* WORK */}
+      {/* WORK / GALLERY */}
       <section id="work" className="py-24 bg-gray-100 px-6">
         <div className="max-w-6xl mx-auto">
           <h3 className="text-3xl font-bold text-center mb-12">
@@ -135,9 +144,9 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              "image1.jpg",
-              "image2.jpg",
-              "image3.jpg",
+              "1.jpg",
+              "2.jpg",
+              "3.jpg",
              ].map((img) => (
               <div key={img} className="rounded-xl overflow-hidden shadow">
                 <img
@@ -158,27 +167,9 @@ export default function Home() {
 
         <form onSubmit={handleSubmit} className="grid gap-4">
 
-          <input
-            name="name"
-            placeholder="Name"
-            className="p-4 border rounded-xl"
-            required
-          />
-
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            className="p-4 border rounded-xl"
-            required
-          />
-
-          <input
-            name="phone"
-            placeholder="Phone"
-            className="p-4 border rounded-xl"
-            required
-          />
+          <input name="name" placeholder="Name" className="p-4 border rounded-xl" required />
+          <input name="email" type="email" placeholder="Email" className="p-4 border rounded-xl" required />
+          <input name="phone" placeholder="Phone" className="p-4 border rounded-xl" required />
 
           <textarea
             name="message"
