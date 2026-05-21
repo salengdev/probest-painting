@@ -22,6 +22,9 @@ export async function POST(req: Request) {
     // GET FORM DATA
     const body = await req.json();
 
+    // TEMP DEBUG LOG
+    console.log("FORM SUBMITTED:", body);
+
     const { name, email, phone, message } = body;
 
     // SEND EMAIL TO YOU
@@ -41,9 +44,10 @@ export async function POST(req: Request) {
       `,
     });
 
+    // EMAIL DEBUG LOG
     console.log("EMAIL RESULT:", emailResult);
 
-    // OPTIONAL AUTO-REPLY
+    // AUTO-REPLY
     await resend.emails.send({
       from: "onboarding@resend.dev",
       to: email,
