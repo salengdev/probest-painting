@@ -1,51 +1,77 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY || "");
-
 export async function POST(req: Request) {
   try {
+    // CHECK ENV VARIABLE
+    const resendKey = process.env.RESEND_API_KEY;
+
+    if (!resendKey) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Missing RESEND_API_KEY",
+        },
+        { status: 500 }
+      );
+    }
+
+    // CREATE RESEND CLIENT
+    const resend = new Resend(resendKey);
+
+    // GET FORM DATA
     const body = await req.json();
 
     const { name, email, phone, message } = body;
 
-    if (!process.env.RESEND_API_KEY) {
-      throw new Error("Missing RESEND_API_KEY");
-    }
-
-    // SEND LEAD EMAIL TO YOU
-    await resend.emails.send({
-      from: "ProBest Painting <onboarding@resend.dev>",
+    // SEND EMAIL TO YOU
+    const emailResult = await resend.emails.send({
+      from: "onboarding@resend.dev",
       to: "salkdee@gmail.com",
-      subject: `New Lead: ${name}`,
+      subject: `New Lead from ${name}`,
       html: `
-        <h2>New Contact Form Submission</h2>
-        <p><b>Name:</b> ${name}</p>
-        <p><b>Email:</b> ${email}</p>
-        <p><b>Phone:</b> ${phone}</p>
-        <p><b>Message:</b> ${message}</p>
+        <h2>New Lead Submission</h2>
+
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Message:</strong></p>
+
+        <p>${message}</p>
       `,
     });
 
-    // AUTO REPLY
+    console.log("EMAIL RESULT:", emailResult);
+
+    // OPTIONAL AUTO-REPLY
     await resend.emails.send({
-      from: "ProBest Painting <onboarding@resend.dev>",
+      from: "onboarding@resend.dev",
       to: email,
       subject: "We received your request",
       html: `
         <p>Hi ${name},</p>
-        <p>Thanks for contacting ProBest Painting. We will respond within 24 hours.</p>
-        <p>Call us: 604-618-0023</p>
+
+        <p>Thanks for contacting ProBest Painting.</p>
+
+        <p>We received your request and will contact you shortly.</p>
+
+        <p>Phone: 604-618-0023</p>
       `,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      emailResult,
+    });
 
-  } catch (error) {
-    console.error("API Error:", error);
+  } catch (error: any) {
+    console.error("CONTACT API ERROR:", error);
 
     return NextResponse.json(
-      { success: false, error: "Email failed" },
+      {
+        success: false,
+        error: error?.message || "Unknown error",
+      },
       { status: 500 }
     );
   }
